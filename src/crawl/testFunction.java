@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,19 +15,22 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 public class testFunction {
 
 	private static String numberAddress;
 
 	public static void main(String[] args) throws InterruptedException, IOException {
 		// TODO Auto-generated method stub
-
+		System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") +"\\chromedriver_win32\\geckodriver.exe");
 		WebDriver driver= new FirefoxDriver();
         JavascriptExecutor js = (JavascriptExecutor)driver;
-        String csvFile = java.time.LocalDateTime.now() + "_result.csv";
+        String csvFile = Calendar.getInstance().getTimeInMillis() + "_result.csv";
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFile), StandardCharsets.UTF_8));
         driver.get("https://www.google.com/maps");
         TimeUnit.SECONDS.sleep(5);
+
         driver.findElement(By.id("searchboxinput")).click();
         driver.findElement(By.id("searchboxinput")).clear();
 
@@ -35,7 +39,7 @@ public class testFunction {
             driver.findElement(By.id("searchboxinput")).clear();
             driver.findElement(By.id("searchboxinput")).sendKeys( i + " Nguyễn Văn Linh Đà Nẵng");
             driver.findElement(By.id("searchbox-searchbutton")).click();
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.MILLISECONDS.sleep(1500);
             String browserUrl = (String) js.executeScript("return decodeURIComponent(window.location.href)");
             System.out.println("Your browser URL is " + browserUrl);
             try {
