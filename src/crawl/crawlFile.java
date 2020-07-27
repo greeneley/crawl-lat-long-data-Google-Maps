@@ -68,8 +68,8 @@ public class crawlFile {
 		} else {
 			fileInput = args[0];
 		}
-		String fileOutput = fileInput.replace(".csv", "");
-		String csvExport = fileOutput + "_result_" + Calendar.getInstance().getTimeInMillis() + ".csv";
+		String nameOutput = fileInput.replace(".csv", "");
+		String fileOutput = nameOutput + "_result_" + Calendar.getInstance().getTimeInMillis() + ".csv";
 
 		/**
 		 * Khởi tạo BufferedReader và Writer
@@ -77,7 +77,7 @@ public class crawlFile {
 
 		BufferedReader bufferedReader = null;
 		BufferedWriter writer = new BufferedWriter(
-				new OutputStreamWriter(new FileOutputStream(csvExport), StandardCharsets.UTF_8));
+				new OutputStreamWriter(new FileOutputStream(fileOutput), StandardCharsets.UTF_8));
 
 		try {
 			bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(fileInput), "UTF8"));
@@ -117,14 +117,14 @@ public class crawlFile {
 						} while (newUrl.contentEquals("https://www.google.com/maps"));
 					}
 					// =================================================
-					driver.findElement(By.id("searchboxinput")).click();
-					driver.findElement(By.id("searchboxinput")).clear();
-					driver.findElement(By.id("searchboxinput")).sendKeys(i + " " + subLine[0] + " " + subLine[1]);
 
 					/**
 					 * Kiểm tra nút SearchButton
 					 */
 					try {
+						driver.findElement(By.id("searchboxinput")).click();
+						driver.findElement(By.id("searchboxinput")).clear();
+						driver.findElement(By.id("searchboxinput")).sendKeys(i + " " + subLine[0] + " " + subLine[1]);
 						WebDriverWait wait = new WebDriverWait(driver, 15);
 						wait.until(
 								ExpectedConditions.visibilityOfAllElementsLocatedBy(By.id("searchbox-searchbutton")));
@@ -159,23 +159,22 @@ public class crawlFile {
 						String[] coordinates = browserUrl.substring(browserUrl.lastIndexOf("3d") + 2).split("!4d", 2);
 						String latitude = coordinates[0].toString();
 						String longtitude = coordinates[1].toString();
-
 						String address = browserUrl.replaceAll("^.*place/|/@.*$", "").replaceAll("\\+", " ");
-						String regex = "^[0-9]+\\S[0-9]*";
+						String regex = "^[A-z]*\\d+[^\\s,]*\\d*";
 						Pattern pattern = Pattern.compile(regex);
 						Matcher matcher = pattern.matcher(address);
+						System.out.println(address);
+
 						while (matcher.find()) {
 							numberAddress = matcher.group();
 						}
 						ConvertUnicode convertUnicode = new ConvertUnicode(address.replaceAll(regex, ""));
 						address = convertUnicode.convert();
-
 						CSVUtils.writeLine(writer, Arrays.asList(numberAddress, address.trim(), latitude, longtitude));
 						writer.flush();
 
 					} catch (Exception e) {
 						System.out.println(e);
-						continue;
 					}
 					count++;
 					if (count == 150) {
